@@ -1,10 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
 ## Getting Started
 
-First, Install Depedencies
+First, Install the depedencies
 ```bash
-npm run install
+npm install
 ```
 
 next, run the development server:
@@ -16,3 +14,4 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 Simple project for searching movies with dummy data. Please note that this project is not responsive and is intended for desktop display.
+Alternatively, you can view the result at this link: https://react-find-movie.vercel.app/
