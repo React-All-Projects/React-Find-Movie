@@ -7,10 +7,9 @@ export default function SearchPages(){
     }
 
     return(
-        <div className="w-4/5 border rounded-2xl m-auto mt-6 h-[600px]">
+        <div className="mx-auto mt-6 w-[92%] max-w-6xl rounded-3xl border border-white/10 bg-slate-900/70 shadow-2xl shadow-slate-950/20">
             <Title textTitle='Cari Movie Anda' />
             <Movies imgUrl={propsComponent.movieImg}/>
-
         </div>
     );
 }

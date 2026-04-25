@@ -12,7 +12,7 @@ export default function Home() {
   }
 
   return (
-    <div className="w-[88%] m-auto mt-20 rounded-2xl border">
+    <div className="mx-auto mt-8 w-[92%] max-w-6xl rounded-3xl border border-white/10 bg-slate-900/70 shadow-2xl shadow-slate-950/20 md:mt-12">
 
       <Navbar links={propsComponent.linkNames} linkd={propsComponent.linkNamed}/>
       <Jumbotron url={propsComponent.urlImage} content={propsComponent.contentImage}/>
