@@ -4,6 +4,90 @@ import Image from "next/image";
 import { useState } from "react";
 import { movies } from "@/database/dummy";
 
+const posterPalettes = [
+    ["0f172a", "e2e8f0"],
+    ["172554", "bfdbfe"],
+    ["3f1d2e", "fbcfe8"],
+    ["3b0764", "e9d5ff"],
+    ["1f2937", "fde68a"],
+];
+
+function escapeSvgText(value) {
+    return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+}
+
+function splitTitle(title) {
+    const words = title.split(" ");
+    const lines = [];
+    let currentLine = "";
+
+    words.forEach((word) => {
+        const candidate = currentLine ? `${currentLine} ${word}` : word;
+
+        if (candidate.length <= 14) {
+            currentLine = candidate;
+            return;
+        }
+
+        if (currentLine) {
+            lines.push(currentLine);
+        }
+
+        currentLine = word;
+    });
+
+    if (currentLine) {
+        lines.push(currentLine);
+    }
+
+    return lines.slice(0, 4);
+}
+
+function getPosterDataUrl(movie) {
+    const [backgroundColor, textColor] = posterPalettes[movie.id % posterPalettes.length];
+    const titleLines = splitTitle(movie.title);
+    const titleMarkup = titleLines
+        .map(
+            (line, index) =>
+                `<text x="36" y="${180 + index * 48}" fill="#${textColor}" font-size="34" font-weight="700" font-family="Arial, sans-serif">${escapeSvgText(line)}</text>`
+        )
+        .join("");
+
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
+            <defs>
+                <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#${backgroundColor}" />
+                    <stop offset="100%" stop-color="#020617" />
+                </linearGradient>
+            </defs>
+            <rect width="400" height="600" rx="32" fill="url(#bg)" />
+            <rect x="28" y="28" width="344" height="544" rx="24" fill="none" stroke="rgba(255,255,255,0.18)" />
+            <text x="36" y="88" fill="#7dd3fc" font-size="20" letter-spacing="6" font-family="Arial, sans-serif">MOVIE</text>
+            ${titleMarkup}
+            <text x="36" y="500" fill="#cbd5e1" font-size="22" font-family="Arial, sans-serif">${escapeSvgText(movie.genre.join(" • "))}</text>
+            <text x="36" y="540" fill="#ffffff" font-size="28" font-weight="700" font-family="Arial, sans-serif">${movie.year}</text>
+        </svg>
+    `.trim();
+
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function getPosterUrl(movie) {
+    const posterUrl = movie.posterURL?.trim();
+
+    if (posterUrl && !posterUrl.includes("via.placeholder.com")) {
+        return posterUrl;
+    }
+
+    return getPosterDataUrl(movie);
+}
+
 export default function Movies({ imgUrl }) {
     const [query, setQuery] = useState("");
     const [selectedId, setSelectedId] = useState(movies[0]?.id ?? null);
@@ -30,6 +114,8 @@ export default function Movies({ imgUrl }) {
         filteredMovies.find((movie) => movie.id === selectedId) ??
         filteredMovies[0] ??
         null;
+
+    const posterSrc = selectedMovie ? getPosterUrl(selectedMovie) : imgUrl;
 
     return (
         <div className="flex flex-col gap-4 rounded-b-3xl bg-slate-950/40 p-4 md:p-6 lg:flex-row lg:items-start">
@@ -88,7 +174,7 @@ export default function Movies({ imgUrl }) {
                         <div className="mx-auto w-full max-w-[220px]">
                             <div className="relative aspect-[2/3] overflow-hidden rounded-3xl border border-white/10 bg-slate-950">
                                 <Image
-                                    src={imgUrl}
+                                    src={posterSrc}
                                     alt={selectedMovie.title}
                                     fill
                                     sizes="(max-width: 1024px) 220px, 220px"
